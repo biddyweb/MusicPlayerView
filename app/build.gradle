@@ -3,20 +3,20 @@ apply plugin: 'checkstyle'
 
 dependencies {
     compile project(':playerview')
-    compile 'com.android.support:appcompat-v7:25.1.0'
-    compile 'com.android.support:support-annotations:25.1.0'
+    compile "com.android.support:appcompat-v7:$SUPPORT_LIBRARY_VERSION"
+    compile "com.android.support:support-annotations:$SUPPORT_LIBRARY_VERSION"
     compile 'com.squareup.picasso:picasso:2.5.2'
 }
 
 android {
 
-    compileSdkVersion 25
-    buildToolsVersion '25.0.2'
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         applicationId "co.mobiwise.musicplayerprogressview"
-        minSdkVersion 14
-        targetSdkVersion 25
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
     }
