@@ -142,7 +142,7 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
     /**
      * Cover image is rotating. That is why we hold that value.
      */
-    private int mRotateDegrees;
+    private float mRotateDegrees;
     /**
      * Handler for posting runnable object
      */
@@ -194,6 +194,12 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
      * Current progress value
      */
     private int currentProgress = 0;
+
+    /**
+     * how many milliseconds waiting for 1 degree rotation
+     */
+    private int  mRotateDuration = 36000;
+
     /**
      * Runnable for turning image (default velocity is 10)
      */
@@ -294,18 +300,20 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
         mPlayPauseDrawable.setToggleListener(this);
 
         //Get Image resource from xml
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.playerview);
-        Drawable mDrawableCover = a.getDrawable(R.styleable.playerview_cover);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.MusicPlayerView);
+        Drawable mDrawableCover = a.getDrawable(R.styleable.MusicPlayerView_cover);
         if (mDrawableCover != null) mBitmapCover = drawableToBitmap(mDrawableCover);
 
-        mProgressVisibility = a.getBoolean(R.styleable.playerview_progressVisibility, true);
-        mButtonColor = a.getColor(R.styleable.playerview_buttonColor, mButtonColor);
+        mProgressVisibility = a.getBoolean(R.styleable.MusicPlayerView_progressVisibility, true);
+        mRotateDuration = a.getInteger(R.styleable.MusicPlayerView_progressRotateDuration, 30000);
+        if (mRotateDuration < 1000) mRotateDuration = 1000;
+        mButtonColor = a.getColor(R.styleable.MusicPlayerView_buttonColor, mButtonColor);
         mProgressEmptyColor =
-                a.getColor(R.styleable.playerview_progressEmptyColor, mProgressEmptyColor);
+                a.getColor(R.styleable.MusicPlayerView_progressEmptyColor, mProgressEmptyColor);
         mProgressLoadedColor =
-                a.getColor(R.styleable.playerview_progressLoadedColor, mProgressLoadedColor);
-        mTextColor = a.getColor(R.styleable.playerview_textColor, mTextColor);
-        mTextSize = a.getDimensionPixelSize(R.styleable.playerview_textSize, mTextSize);
+                a.getColor(R.styleable.MusicPlayerView_progressLoadedColor, mProgressLoadedColor);
+        mTextColor = a.getColor(R.styleable.MusicPlayerView_textColor, mTextColor);
+        mTextSize = a.getDimensionPixelSize(R.styleable.MusicPlayerView_textSize, mTextSize);
         a.recycle();
 
         mRotateDegrees = 0;
@@ -343,6 +351,7 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
         //rectF and rect initializes
         rectF = new RectF();
         mRectText = new Rect();
+        mButtonRegion = new Region();
     }
 
     /**
@@ -365,18 +374,18 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
         mCenterY = mHeight / 2f;
 
         //set RectF left, top, right, bottom coordiantes
-        rectF.set(20.0f, 20.0f, mWidth - 20.0f, mHeight - 20.0f);
+        rectF.set(mCenterX - minSide/2 + 20f, mCenterY - minSide/2 + 20f, mCenterX + minSide/2 - 20f, mCenterY + minSide/2 - 20f);
 
         //button size is about to 1/4 of image size then we divide it to 8.
-        mButtonRadius = mWidth / 8.0f;
+        mButtonRadius = minSide / 8.0f;
 
         //We resize play/pause drawable with button radius. button needs to be inside circle.
         mPlayPauseDrawable.resize((1.2f * mButtonRadius / 5.0f), (3.0f * mButtonRadius / 5.0f) + 10.0f,
                 (mButtonRadius / 5.0f));
 
-        mPlayPauseDrawable.setBounds(0, 0, mWidth, mHeight);
+        mPlayPauseDrawable.setBounds((int)(mCenterX - minSide/2), (int)(mCenterY - minSide/2), (int)(mCenterX + minSide/2), (int)(mCenterY + minSide/2));
 
-        mButtonRegion = new Region((int) (mCenterX - mButtonRadius), (int) (mCenterY - mButtonRadius),
+        mButtonRegion.set((int) (mCenterX - mButtonRadius), (int) (mCenterY - mButtonRadius),
                 (int) (mCenterX + mButtonRadius), (int) (mCenterY + mButtonRadius));
 
         createShader();
@@ -475,7 +484,9 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
             mBitmapCover.eraseColor(mCoverColor);
         }
 
-        mCoverScale = ((float) mWidth) / (float) mBitmapCover.getWidth();
+        float scaleX = ((float) mWidth) / (float) mBitmapCover.getWidth();
+        float scaleY = ((float) mHeight) / (float) mBitmapCover.getHeight();
+        mCoverScale = Math.min(scaleX, scaleY);
 
         mBitmapCover =
                 Bitmap.createScaledBitmap(mBitmapCover, (int) (mBitmapCover.getWidth() * mCoverScale),
@@ -491,7 +502,7 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
      * Update rotate degree of cover and invalide onDraw();
      */
     public void updateCoverRotate() {
-        mRotateDegrees += VELOCITY;
+        mRotateDegrees += (VELOCITY*ROTATE_DELAY)*360f/mRotateDuration;
         mRotateDegrees = mRotateDegrees % 360;
         postInvalidate();
     }
@@ -507,9 +518,8 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
      * Start turning image
      */
     public void start() {
-
         isRotating = true;
-        mPlayPauseDrawable.setPlaying(isRotating);
+        mPlayPauseDrawable.setPlaying(true);
         mHandlerRotate.removeCallbacksAndMessages(null);
         mHandlerRotate.postDelayed(mRunnableRotate, ROTATE_DELAY);
         if (isAutoProgress) {
@@ -524,16 +534,8 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
      */
     public void stop() {
         isRotating = false;
-        mPlayPauseDrawable.setPlaying(isRotating);
+        mPlayPauseDrawable.setPlaying(false);
         postInvalidate();
-    }
-
-    /**
-     * Set velocity.When updateCoverRotate() method called,
-     * increase degree by velocity value.
-     */
-    public void setVelocity(int velocity) {
-        if (velocity > 0) VELOCITY = velocity;
     }
 
     /**
@@ -543,6 +545,13 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
         mBitmapCover = coverBitmap;
         createShader();
         postInvalidate();
+    }
+
+    public void setRotateDuration(int rotateDuration) {
+        if (rotateDuration > 1000)
+            mRotateDuration = rotateDuration;
+        else
+            mRotateDuration = 1000;
     }
 
     /**

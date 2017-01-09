@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="playerview">
+    <declare-styleable name="MusicPlayerView">
         <attr name="cover" format="integer" />
         <attr name="buttonColor" format="color"/>
         <attr name="progressVisibility" format="boolean"/>
         <attr name="progressEmptyColor" format="color"/>
         <attr name="progressLoadedColor" format="color"/>
+        <attr name="progressRotateDuration" format="integer"/>
         <attr name="textColor" format="color"/>
         <attr name="textSize" format="dimension"/>
     </declare-styleable>
