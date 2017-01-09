@@ -39,6 +39,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 
+import java.util.Locale;
+
 public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
 
     /**
@@ -296,6 +298,7 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
         Drawable mDrawableCover = a.getDrawable(R.styleable.playerview_cover);
         if (mDrawableCover != null) mBitmapCover = drawableToBitmap(mDrawableCover);
 
+        mProgressVisibility = a.getBoolean(R.styleable.playerview_progressVisibility, true);
         mButtonColor = a.getColor(R.styleable.playerview_buttonColor, mButtonColor);
         mProgressEmptyColor =
                 a.getColor(R.styleable.playerview_progressEmptyColor, mProgressEmptyColor);
@@ -406,7 +409,8 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
             canvas.drawArc(rectF, 145, 250, false, mPaintProgressEmpty);
 
             //Draw loaded progress
-            canvas.drawArc(rectF, 145, calculatePastProgressDegree(), false, mPaintProgressLoaded);
+            float progressDegree = calculatePastProgressDegree();
+            canvas.drawArc(rectF, 145, progressDegree == 0 ? 0.001f : progressDegree, false, mPaintProgressLoaded);
 
             //Draw left time text
             String leftTime = secondsToTime(calculateLeftSeconds());
@@ -684,17 +688,16 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
      * Convert seconds to time
      */
     private String secondsToTime(int seconds) {
-        String time = "";
+        StringBuilder builder = new StringBuilder();
+        int hour = seconds / 3600;
+        if (hour > 0)
+            builder.append(String.format(Locale.ENGLISH, "%d:", hour));
+        int minute = (seconds % 3600) / 60;
+        builder.append(String.format(Locale.ENGLISH, "%02d:", minute));
+        int second = seconds % 60;
+        builder.append(String.format(Locale.ENGLISH, "%02d", second));
 
-        String minutesText = String.valueOf(seconds / 60);
-        if (minutesText.length() == 1) minutesText = "0" + minutesText;
-
-        String secondsText = String.valueOf(seconds % 60);
-        if (secondsText.length() == 1) secondsText = "0" + secondsText;
-
-        time = minutesText + ":" + secondsText;
-
-        return time;
+        return builder.toString();
     }
 
     /**

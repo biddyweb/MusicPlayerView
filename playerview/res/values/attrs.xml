@@ -3,6 +3,7 @@
     <declare-styleable name="playerview">
         <attr name="cover" format="integer" />
         <attr name="buttonColor" format="color"/>
+        <attr name="progressVisibility" format="boolean"/>
         <attr name="progressEmptyColor" format="color"/>
         <attr name="progressLoadedColor" format="color"/>
         <attr name="textColor" format="color"/>
