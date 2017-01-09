@@ -173,10 +173,10 @@ public class PlayPauseDrawable extends Drawable {
     return PixelFormat.TRANSLUCENT;
   }
 
-  public void resize(float mPauseBarWidth, float mPauseBarHeight, float mPauseBarDistance) {
-    this.mPauseBarWidth = mPauseBarWidth;
-    this.mPauseBarHeight = mPauseBarHeight;
-    this.mPauseBarDistance = mPauseBarDistance;
+  public void resize(float pauseBarWidth, float pauseBarHeight, float pauseBarDistance) {
+    this.mPauseBarWidth = pauseBarWidth;
+    this.mPauseBarHeight = pauseBarHeight;
+    this.mPauseBarDistance = pauseBarDistance;
     invalidateSelf();
   }
 
