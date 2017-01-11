@@ -198,7 +198,7 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
     /**
      * how many milliseconds waiting for 1 degree rotation
      */
-    private int  mRotateDuration = 36000;
+    private int mRotateDuration = 36000;
 
     /**
      * Runnable for turning image (default velocity is 10)
@@ -374,7 +374,7 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
         mCenterY = mHeight / 2f;
 
         //set RectF left, top, right, bottom coordiantes
-        rectF.set(mCenterX - minSide/2 + 20f, mCenterY - minSide/2 + 20f, mCenterX + minSide/2 - 20f, mCenterY + minSide/2 - 20f);
+        rectF.set(mCenterX - minSide / 2 + 20f, mCenterY - minSide / 2 + 20f, mCenterX + minSide / 2 - 20f, mCenterY + minSide / 2 - 20f);
 
         //button size is about to 1/4 of image size then we divide it to 8.
         mButtonRadius = minSide / 8.0f;
@@ -383,7 +383,7 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
         mPlayPauseDrawable.resize((1.2f * mButtonRadius / 5.0f), (3.0f * mButtonRadius / 5.0f) + 10.0f,
                 (mButtonRadius / 5.0f));
 
-        mPlayPauseDrawable.setBounds((int)(mCenterX - minSide/2), (int)(mCenterY - minSide/2), (int)(mCenterX + minSide/2), (int)(mCenterY + minSide/2));
+        mPlayPauseDrawable.setBounds((int) (mCenterX - minSide / 2), (int) (mCenterY - minSide / 2), (int) (mCenterX + minSide / 2), (int) (mCenterY + minSide / 2));
 
         mButtonRegion.set((int) (mCenterX - mButtonRadius), (int) (mCenterY - mButtonRadius),
                 (int) (mCenterX + mButtonRadius), (int) (mCenterY + mButtonRadius));
@@ -480,7 +480,7 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
 
         //if mBitmapCover is null then create default colored cover
         if (mBitmapCover == null) {
-            mBitmapCover = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+            mBitmapCover = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
             mBitmapCover.eraseColor(mCoverColor);
         }
 
@@ -488,9 +488,11 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
         float scaleY = ((float) mHeight) / (float) mBitmapCover.getHeight();
         mCoverScale = Math.min(scaleX, scaleY);
 
-        mBitmapCover =
-                Bitmap.createScaledBitmap(mBitmapCover, (int) (mBitmapCover.getWidth() * mCoverScale),
-                        (int) (mBitmapCover.getHeight() * mCoverScale), true);
+        Bitmap originBitmap = mBitmapCover;
+        mBitmapCover = Bitmap.createScaledBitmap(originBitmap,
+                (int) (mBitmapCover.getWidth() * mCoverScale),
+                (int) (mBitmapCover.getHeight() * mCoverScale),
+                true);
 
         mShader = new BitmapShader(mBitmapCover, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
         mPaintCover = new Paint();
@@ -502,7 +504,7 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
      * Update rotate degree of cover and invalide onDraw();
      */
     public void updateCoverRotate() {
-        mRotateDegrees += (VELOCITY*ROTATE_DELAY)*360f/mRotateDuration;
+        mRotateDegrees += (VELOCITY * ROTATE_DELAY) * 360f / mRotateDuration;
         mRotateDegrees = mRotateDegrees % 360;
         postInvalidate();
     }
@@ -542,9 +544,11 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
      * set cover image resource
      */
     public void setCoverBitmap(Bitmap coverBitmap) {
-        mBitmapCover = coverBitmap;
-        createShader();
-        postInvalidate();
+        if (coverBitmap != mBitmapCover) {
+            mBitmapCover = coverBitmap;
+            createShader();
+            postInvalidate();
+        }
     }
 
     public void setRotateDuration(int rotateDuration) {
@@ -559,9 +563,7 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
      */
     public void setCoverDrawable(int coverDrawable) {
         Drawable drawable = getContext().getResources().getDrawable(coverDrawable);
-        mBitmapCover = drawableToBitmap(drawable);
-        createShader();
-        postInvalidate();
+        setCoverBitmap(drawableToBitmap(drawable));
     }
 
     /**
@@ -570,9 +572,7 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
      * @param drawable
      */
     public void setCoverDrawable(Drawable drawable) {
-        mBitmapCover = drawableToBitmap(drawable);
-        createShader();
-        postInvalidate();
+        setCoverBitmap(drawableToBitmap(drawable));
     }
 
     /**
@@ -623,8 +623,7 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
         float scaleHeight = ((float) newHeight) / height;
         Matrix matrix = new Matrix();
         matrix.postScale(scaleWidth, scaleHeight);
-        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
-        return resizedBitmap;
+        return Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
     }
 
     /**
@@ -760,5 +759,11 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
         mAnimatorSet.setDuration(PLAY_PAUSE_ANIMATION_DURATION);
         mAnimatorSet.playTogether(pausePlayAnim);
         mAnimatorSet.start();
+    }
+
+    public void destroy() {
+        if (mBitmapCover != null)
+            mBitmapCover.recycle();
+        mShader = null;
     }
 }
