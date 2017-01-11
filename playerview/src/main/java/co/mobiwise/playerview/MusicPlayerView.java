@@ -79,7 +79,7 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
     /**
      * Handler will post runnable object every @ROTATE_DELAY seconds.
      */
-    private static int ROTATE_DELAY = 10;
+    private static int ROTATE_DELAY = 33;
     /**
      * 1 sn = 1000 ms
      */
