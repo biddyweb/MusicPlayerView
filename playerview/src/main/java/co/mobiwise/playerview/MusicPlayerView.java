@@ -15,7 +15,6 @@
 */
 package co.mobiwise.playerview;
 
-import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -228,7 +227,7 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
     /**
      * Play Pause drawable
      */
-    private PlayPauseDrawable mPlayPauseDrawable;
+//    private PlayPauseDrawable mPlayPauseDrawable;
     /**
      * Runnable for turning image (default velocity is 10)
      */
@@ -295,9 +294,9 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
     private void init(Context context, AttributeSet attrs) {
 
         setWillNotDraw(false);
-        mPlayPauseDrawable = new PlayPauseDrawable(context);
-        mPlayPauseDrawable.setCallback(callback);
-        mPlayPauseDrawable.setToggleListener(this);
+//        mPlayPauseDrawable = new PlayPauseDrawable(context);
+//        mPlayPauseDrawable.setCallback(callback);
+//        mPlayPauseDrawable.setToggleListener(this);
 
         //Get Image resource from xml
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.MusicPlayerView);
@@ -380,10 +379,10 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
         mButtonRadius = minSide / 8.0f;
 
         //We resize play/pause drawable with button radius. button needs to be inside circle.
-        mPlayPauseDrawable.resize((1.2f * mButtonRadius / 5.0f), (3.0f * mButtonRadius / 5.0f) + 10.0f,
-                (mButtonRadius / 5.0f));
+//        mPlayPauseDrawable.resize((1.2f * mButtonRadius / 5.0f), (3.0f * mButtonRadius / 5.0f) + 10.0f,
+//                (mButtonRadius / 5.0f));
 
-        mPlayPauseDrawable.setBounds((int) (mCenterX - minSide / 2), (int) (mCenterY - minSide / 2), (int) (mCenterX + minSide / 2), (int) (mCenterY + minSide / 2));
+//        mPlayPauseDrawable.setBounds((int) (mCenterX - minSide / 2), (int) (mCenterY - minSide / 2), (int) (mCenterX + minSide / 2), (int) (mCenterY + minSide / 2));
 
         mButtonRegion.set((int) (mCenterX - mButtonRadius), (int) (mCenterY - mButtonRadius),
                 (int) (mCenterX + mButtonRadius), (int) (mCenterY + mButtonRadius));
@@ -408,10 +407,10 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
         canvas.drawCircle(mCenterX, mCenterY, radius, mPaintCover);
 
         //Rotate back to make play/pause button stable(No turn)
-        canvas.rotate(-mRotateDegrees, mCenterX, mCenterY);
+//        canvas.rotate(-mRotateDegrees, mCenterX, mCenterY);
 
         //Draw Play/Pause button
-        canvas.drawCircle(mCenterX, mCenterY, mButtonRadius, mPaintButton);
+//        canvas.drawCircle(mCenterX, mCenterY, mButtonRadius, mPaintButton);
 
         if (mProgressVisibility) {
             //Draw empty progress
@@ -446,7 +445,7 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
             mFirstDraw = false;
         }
 
-        mPlayPauseDrawable.draw(canvas);
+//        mPlayPauseDrawable.draw(canvas);
     }
 
     /**
@@ -521,7 +520,7 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
      */
     public void start() {
         isRotating = true;
-        mPlayPauseDrawable.setPlaying(true);
+//        mPlayPauseDrawable.setPlaying(true);
         mHandlerRotate.removeCallbacksAndMessages(null);
         mHandlerRotate.postDelayed(mRunnableRotate, ROTATE_DELAY);
         if (isAutoProgress) {
@@ -536,7 +535,7 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
      */
     public void stop() {
         isRotating = false;
-        mPlayPauseDrawable.setPlaying(false);
+//        mPlayPauseDrawable.setPlaying(false);
         postInvalidate();
     }
 
@@ -754,10 +753,10 @@ public class MusicPlayerView extends View implements OnPlayPauseToggleListener {
         }
 
         mAnimatorSet = new AnimatorSet();
-        final Animator pausePlayAnim = mPlayPauseDrawable.getPausePlayAnimator();
+//        final Animator pausePlayAnim = mPlayPauseDrawable.getPausePlayAnimator();
         mAnimatorSet.setInterpolator(new DecelerateInterpolator());
         mAnimatorSet.setDuration(PLAY_PAUSE_ANIMATION_DURATION);
-        mAnimatorSet.playTogether(pausePlayAnim);
+//        mAnimatorSet.playTogether(pausePlayAnim);
         mAnimatorSet.start();
     }
 
