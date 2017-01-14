@@ -21,7 +21,7 @@ project.ext {
   targetSdkVersion = 25
 
   PLAY_SERVICES_VERSION = '10.0.1'
-  SUPPORT_LIBRARY_VERSION = '25.1.0'
+  SUPPORT_LIBRARY_VERSION = '25.0.1'
 }
 
 task wrapper(type: Wrapper) {
